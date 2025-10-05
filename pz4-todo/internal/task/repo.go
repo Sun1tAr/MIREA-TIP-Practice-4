@@ -56,25 +56,38 @@ func (r *Repo) DoneList(isDone bool) []*Task {
 	return out
 }
 
-// PaginatedList Паггинированный список задач
 func (r *Repo) PaginatedList(page int64, limit int64) []*Task {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	out := make([]*Task, 0, len(r.items))
-	if page <= 0 || limit <= 0 || int(limit) <= len(r.items) {
-		for _, t := range r.items {
-			out = append(out, t)
-		}
-	} else {
-		out = make([]*Task, 0, int(limit))
-		left := limit * (page - 1)
-		right := limit * page
-		for i := left; i < right; i++ {
-			out = append(out, r.items[i])
-		}
+
+	// Если некорректные параметры - возвращаем пустой список
+	if page <= 0 || limit <= 0 {
+		return []*Task{}
 	}
 
-	return out
+	// Преобразуем map в slice для пагинации
+	allTasks := make([]*Task, 0, len(r.items))
+	for _, t := range r.items {
+		allTasks = append(allTasks, t)
+	}
+
+	// Если лимит больше общего количества - возвращаем все
+	if int(limit) >= len(allTasks) {
+		return allTasks
+	}
+
+	// Пагинация
+	start := (page - 1) * limit
+	if start >= int64(len(allTasks)) {
+		return []*Task{} // Страница за пределами
+	}
+
+	end := start + limit
+	if end > int64(len(allTasks)) {
+		end = int64(len(allTasks))
+	}
+
+	return allTasks[start:end]
 }
 
 func (r *Repo) Get(id int64) (*Task, error) {
@@ -104,14 +117,16 @@ func (r *Repo) Create(title string) *Task {
 
 func (r *Repo) Update(id int64, title string, done bool) (*Task, error) {
 	r.mu.Lock()
-	defer r.mu.Unlock()
 	t, ok := r.items[id]
 	if !ok {
+		r.mu.Unlock()
 		return nil, ErrNotFound
 	}
 	t.Title = title
 	t.Done = done
 	t.UpdatedAt = time.Now()
+
+	r.mu.Unlock()
 	err := r.Save()
 	if err != nil {
 		log.Fatal("Save failed when update: ", err)
@@ -121,11 +136,13 @@ func (r *Repo) Update(id int64, title string, done bool) (*Task, error) {
 
 func (r *Repo) Delete(id int64) error {
 	r.mu.Lock()
-	defer r.mu.Unlock()
 	if _, ok := r.items[id]; !ok {
+		r.mu.Unlock()
 		return ErrNotFound
 	}
 	delete(r.items, id)
+
+	r.mu.Unlock()
 	err := r.Save()
 	if err != nil {
 		log.Fatal("Save failed when delete: ", err)
