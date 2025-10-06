@@ -83,7 +83,7 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !middleware.TitleValidation(req.Title) {
-		httpError(w, http.StatusBadRequest, "invalid title")
+		httpError(w, http.StatusUnprocessableEntity, "invalid title")
 		return
 	}
 	t := h.repo.Create(req.Title)

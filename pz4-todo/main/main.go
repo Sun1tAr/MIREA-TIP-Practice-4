@@ -13,7 +13,7 @@ import (
 
 func main() {
 	repo := task.NewRepo()
-	inFileRepo := task.NewFileRepo("/repos")
+	inFileRepo := task.NewFileRepo("tasks.json")
 	h := task.NewHandler(repo)
 	handler := task.NewHandler(inFileRepo)
 
