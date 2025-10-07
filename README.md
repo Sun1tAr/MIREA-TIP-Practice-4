@@ -61,35 +61,35 @@ pz4-todo/
 ### Примеры запросов
 `GET /tasks` без параметров
 
-![alt text](image-5.png)
+![image-5.png](pz4-todo/about/image-5.png)
 
 `POST /tasks` успешная валидация
 
-![alt text](image.png)
+![alt text](pz4-todo/about/image.png)
 
 `POST /tasks` ошибка валидации
 
-![alt text](image-1.png)
+![alt text](pz4-todo/about/image-1.png)
 
 `GET /tasks/{id}` 
 
-![alt text](image-2.png)
+![alt text](pz4-todo/about/image-2.png)
 
 `PUT /tasks/{id}`
 
-![alt text](image-4.png)
+![alt text](pz4-todo/about/image-4.png)
 
 `DELETE /tasks/{id}`
 
-![alt text](image-6.png)
+![alt text](pz4-todo/about/image-6.png)
 
 `GET /tasks` с фильтром по done
 
-![alt text](image-7.png)
+![alt text](pz4-todo/about/image-7.png)
 
 `GET /tasks` с пагинацией
 
-![alt text](image-8.png)
+![alt text](pz4-todo/about/image-8.png)
 
 ### Пример тестирования
 
